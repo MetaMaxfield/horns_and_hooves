@@ -1,0 +1,28 @@
+services:
+
+  db:
+    image: postgis/postgis:16-3.4
+    container_name: hnh_db
+    restart: always
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - hnh_network
+
+volumes:
+  postgres_data:
+
+networks:
+  hnh_network:
+    driver: bridge
