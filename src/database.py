@@ -1,5 +1,14 @@
 from sqlalchemy.orm import DeclarativeBase, declared_attr
-from sqlalchemy.ext.asyncio import AsyncAttrs
+from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
+
+from src.config import settings
+
+DATABASE_URL = settings.connection_url
+DATABASE_PARAMS = {}
+
+
+engine = create_async_engine(DATABASE_URL, **DATABASE_PARAMS)
+async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
 
 
 class Base(AsyncAttrs, DeclarativeBase):
