@@ -15,9 +15,9 @@ class BuildingBase(BaseModel):
     model_config = ConfigDict(extra="forbid", from_attributes=True)
 
 
-class BuildingCreate(BaseModel):
+class BuildingCreate(BuildingBase):
     pass
 
 
-class BuildingRead(BaseModel):
+class BuildingRead(BuildingBase):
     id: int

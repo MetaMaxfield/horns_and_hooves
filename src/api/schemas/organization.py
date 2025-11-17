@@ -1,12 +1,10 @@
-from typing import TYPE_CHECKING
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic_extra_types.phone_numbers import PhoneNumber
 
 from src.entity.constants import ORGANIZATION_NAME_MAX_LENGTH
 
-if TYPE_CHECKING:
-    from src.api.schemas.building import BuildingRead
-    from src.api.schemas.activity import ActivityRead
+from src.api.schemas.building import BuildingRead
+from src.api.schemas.activity import ActivityRead
 
 
 class PhoneNumberBase(BaseModel):
@@ -36,6 +34,6 @@ class OrganizationCreate(OrganizationBase):
 class OrganizationRead(OrganizationBase):
     id: int
 
-    phone_numbers: list["PhoneNumberRead"]
-    building: "BuildingRead"
-    activities: "ActivityRead"
+    phone_numbers: list[PhoneNumberRead]
+    building: BuildingRead
+    activities: list[ActivityRead]
