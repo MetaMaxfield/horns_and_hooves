@@ -11,10 +11,20 @@ from src.repo.organization.models import Organization
 router = APIRouter(prefix="/buildings")
 
 
-@router.get("/{building_id}/organizations")
+@router.get("/{building_id}/organizations", tags=["Организации"])
 async def organizations_in_building(
     building_id: int, session: AsyncSession = Depends(get_db_session)
 ) -> list[OrganizationRead]:
+    """
+    Handler поиска организаций по ID здания.\n
+    \n
+    Query params:\n
+        building_id (int): ID здания, по которому производится поиск организаций.\n
+    \n
+    Returns:\n
+        list[OrganizationRead]: Список найденных организаций с подгруженными
+        контактами и информацией о здании.\n
+    """
     query = (
         select(Organization)
         .filter_by(building_id=building_id)

@@ -17,10 +17,19 @@ from src.repo.organization.models import Organization
 router = APIRouter(prefix="/organizations")
 
 
-@router.get("/recursive-search-by-activity")
+@router.get("/recursive-search-by-activity", tags=["Организации"])
 async def organizations_by_recursive_activity(
     activity_name: str, session: AsyncSession = Depends(get_db_session)
 ) -> list[OrganizationRead]:
+    """
+    Handler поиска организаций по названию вида деятельности с рекурсивным обходом дерева.\n
+    \n
+    Query params:\n
+        activity_name (str): Название вида деятельности для поиска.\n
+    \n
+    Returns:\n
+        list[OrganizationRead]: Список организаций, связанных с найденными видами деятельности.\n
+    """
     # базовая часть CTE — сам activity
     subtree = (
         select(Activity.id)
@@ -53,11 +62,22 @@ async def organizations_by_recursive_activity(
     return orgs.scalars().all()
 
 
-@router.get("/within-radius")
+@router.get("/within-radius", tags=["Организации"])
 async def organizations_in_radius(
     circle: Annotated[Circle, Query()],
     session: AsyncSession = Depends(get_db_session),
 ) -> list[OrganizationRead]:
+    """
+    Handler поиска организаций в радиусе от указанной точки.\n
+    \n
+    Query params:\n
+        lat (float): Широта центра круга.\n
+        lon (float): Долгота центра круга.\n
+        radius (int): Радиус поиска в метрах.\n
+    \n
+    Returns:\n
+        list[OrganizationRead]: Список организаций, находящихся в указанном радиусе.\n
+    """
     center_point = geo_func.ST_SetSRID(
         geo_func.ST_MakePoint(circle.lon, circle.lat), 4326
     )
@@ -79,11 +99,23 @@ async def organizations_in_radius(
     return orgs.scalars().all()
 
 
-@router.get("/within-rectangle")
-async def organizations_in_area(
+@router.get("/within-rectangle", tags=["Организации"])
+async def organizations_in_rectangle(
     rectangle: Annotated[Rectangle, Query()],
     session: AsyncSession = Depends(get_db_session),
 ) -> list[OrganizationRead]:
+    """
+    Handler поиска организаций в прямоугольной области.\n
+    \n
+    Query params:\n
+        lat_min (float): Минимальная широта прямоугольника.\n
+        lat_max (float): Максимальная широта прямоугольника.\n
+        lon_min (float): Минимальная долгота прямоугольника.\n
+        lon_max (float): Максимальная долгота прямоугольника.\n
+    \n
+    Returns:\n
+        list[OrganizationRead]: Список организаций, находящихся в указанной области.\n
+    """
     envelope = geo_func.ST_MakeEnvelope(
         rectangle.lon_min, rectangle.lat_min, rectangle.lon_max, rectangle.lat_max, 4326
     )
@@ -99,10 +131,19 @@ async def organizations_in_area(
     return orgs.scalars().all()
 
 
-@router.get("/by-name")
+@router.get("/by-name", tags=["Организации"])
 async def organizations_by_name(
     organization_name: str, session: AsyncSession = Depends(get_db_session)
 ) -> list[OrganizationRead]:
+    """
+    Handler поиска организаций по названию.\n
+    \n
+    Query params:\n
+        organization_name (str): Подстрока для поиска в названии организации.\n
+    \n
+    Returns:\n
+        list[OrganizationRead]: Список организаций, название которых совпадает с поиском.\n
+    """
     query = (
         select(Organization)
         .options(selectinload(Organization.phone_numbers))
@@ -114,10 +155,19 @@ async def organizations_by_name(
     return orgs.scalars().all()
 
 
-@router.get("/{organization_id}")
+@router.get("/{organization_id}", tags=["Организации"])
 async def organization_by_id(
     organization_id: int, session: AsyncSession = Depends(get_db_session)
 ) -> OrganizationRead:
+    """
+    Handler получения информации об организации по её ID.\n
+    \n
+    Query params:\n
+        organization_id (int): ID организации для поиска.\n
+    \n
+    Returns:\n
+        OrganizationRead: Информация об организации.\n
+    """
     query = (
         select(Organization)
         .filter_by(id=organization_id)

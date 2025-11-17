@@ -12,10 +12,19 @@ from src.repo.organization.models import Organization
 router = APIRouter(prefix="/activities")
 
 
-@router.get("/{activity_id}/organizations")
+@router.get("/{activity_id}/organizations", tags=["Организации"])
 async def organizations_with_activity(
     activity_id: int, session: AsyncSession = Depends(get_db_session)
 ) -> list[OrganizationRead]:
+    """
+    Handler поиска организаций по ID вида деятельности.\n
+    \n
+    Query params:\n
+        activity_id (int): ID вида деятельности.\n
+    \n
+    Returns:\n
+        list[OrganizationRead]: Список организаций с подгруженными связями.\n
+    """
     query = (
         select(Organization)
         .filter(Organization.activities.any(Activity.id == activity_id))
