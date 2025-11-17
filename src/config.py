@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PASSWORD: str
 
+    API_KEY: str
+
     @property
     def connection_url(self):
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
