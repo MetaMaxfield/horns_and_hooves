@@ -25,7 +25,7 @@ class Organization(Base):
     phone_numbers: Mapped[list["PhoneNumber"]] = relationship(
         back_populates="organization"
     )
-    building: Mapped["Building"] = relationship(back_populates="organization")
+    building: Mapped["Building"] = relationship(back_populates="organizations")
     activities: Mapped[list["Activity"]] = relationship(
         secondary="organization_activities", back_populates="organization"
     )

@@ -21,5 +21,7 @@ class Activity(Base):
     organization: Mapped["Organization"] = relationship(
         secondary="organization_activities", back_populates="activities"
     )
-    parent: Mapped["Activity"] = relationship(back_populates="childs")
+    parent: Mapped["Activity"] = relationship(
+        back_populates="childs", remote_side="Activity.id"
+    )
     childs: Mapped["Activity"] = relationship(back_populates="parent")
