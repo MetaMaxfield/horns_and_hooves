@@ -8,11 +8,49 @@ from geoalchemy2 import Geography, functions as geo_func
 from src.api.dependencies import get_db_session
 from src.api.schemas.geo import Circle, Rectangle
 from src.api.schemas.organization import OrganizationRead
+from src.repo.activity.models import Activity
+from src.repo.associations.models import OrganizationActivity
 from src.repo.building.models import Building
 from src.repo.organization.models import Organization
 
 
 router = APIRouter(prefix="/organizations")
+
+
+@router.get("/recursive-search-by-activity")
+async def organizations_by_recursive_activity(
+    activity_name: str, session: AsyncSession = Depends(get_db_session)
+) -> list[OrganizationRead]:
+    # базовая часть CTE — сам activity
+    subtree = (
+        select(Activity.id)
+        .filter(Activity.name.ilike(f"%{activity_name}%"))
+        .cte(name="subtree", recursive=True)
+    )
+
+    # рекурсивная часть — берем те activity, у которых parent_id == id из subtree
+    subtree = subtree.union_all(
+        select(Activity.id).where(Activity.parent_id == subtree.c.id)
+    )
+
+    # теперь выбираем организации, у которых есть activity из subtree
+    query = (
+        select(Organization)
+        .join(
+            OrganizationActivity,
+            Organization.id == OrganizationActivity.organization_id,
+        )
+        .join(subtree, OrganizationActivity.activity_id == subtree.c.id)
+        .options(
+            selectinload(Organization.phone_numbers),
+            selectinload(Organization.activities),
+            joinedload(Organization.building),
+        )
+        .distinct()
+    )
+
+    orgs = await session.execute(query)
+    return orgs.scalars().all()
 
 
 @router.get("/within-radius")
