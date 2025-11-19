@@ -1,12 +1,9 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload, selectinload
 
-from src.api.dependencies import get_db_session
+from src.api.dependencies import get_organization_use_case
+from src.api.schemas.mappers.organization import organization_entity_to_schema
 from src.api.schemas.organization import OrganizationRead
-from src.repo.activity.models import Activity
-from src.repo.organization.models import Organization
+from src.usecase.organization import OrganizationUseCase
 
 
 router = APIRouter(prefix="/activities")
@@ -14,7 +11,7 @@ router = APIRouter(prefix="/activities")
 
 @router.get("/{activity_id}/organizations", tags=["Организации"])
 async def organizations_with_activity(
-    activity_id: int, session: AsyncSession = Depends(get_db_session)
+    activity_id: int, use_case: OrganizationUseCase = Depends(get_organization_use_case)
 ) -> list[OrganizationRead]:
     """
     Handler поиска организаций по ID вида деятельности.\n
@@ -25,12 +22,5 @@ async def organizations_with_activity(
     Returns:\n
         list[OrganizationRead]: Список организаций с подгруженными связями.\n
     """
-    query = (
-        select(Organization)
-        .filter(Organization.activities.any(Activity.id == activity_id))
-        .options(selectinload(Organization.phone_numbers))
-        .options(selectinload(Organization.activities))
-        .options(joinedload(Organization.building))
-    )
-    result = await session.execute(query)
-    return result.scalars().all()
+    orgs = await use_case.get_organizations_with_activity(activity_id)
+    return [organization_entity_to_schema(org) for org in orgs]
