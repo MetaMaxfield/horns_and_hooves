@@ -9,34 +9,41 @@ class OrganizationUseCase:
     async def get_org_by_recursive_activity(
         self, activity_name: str
     ) -> list[OrganizationEntity]:
-        return self.repo.get_org_by_recursive_activity(activity_name)
+        orgs = await self.repo.get_org_by_recursive_activity(activity_name)
+        return orgs
 
     async def get_organizations_in_radius(
         self, lon: float, lat: float, radius: int
     ) -> list[OrganizationEntity]:
-        return self.repo.get_organizations_in_radius(lon, lat, radius)
+        orgs = await self.repo.get_organizations_in_radius(lon, lat, radius)
+        return orgs
 
     async def get_organizations_in_rectangle(
         self, lon_min: float, lat_min: float, lon_max: float, lat_max: float
     ) -> list[OrganizationEntity]:
-        return self.repo.get_organizations_in_rectangle(
+        orgs = await self.repo.get_organizations_in_rectangle(
             lon_min, lat_min, lon_max, lat_max
         )
+        return orgs
 
     async def get_organizations_by_name(
         self, organization_name: str
     ) -> list[OrganizationEntity]:
-        return self.repo.get_organizations_by_name(organization_name)
+        orgs = await self.repo.get_organizations_by_name(organization_name)
+        return orgs
 
     async def get_organization_by_id(self, organization_id: int) -> OrganizationEntity:
-        return self.repo.get_organization_by_id(organization_id)
+        org = await self.repo.get_organization_by_id(organization_id)
+        return org
 
     async def get_organizations_in_building(
         self, building_id: int
     ) -> list[OrganizationEntity]:
-        return self.repo.get_organizations_in_building(building_id)
+        orgs = await self.repo.get_organizations_in_building(building_id)
+        return orgs
 
     async def get_organizations_with_activity(
         self, activity_id: int
     ) -> list[OrganizationEntity]:
-        return self.repo.get_organizations_with_activity(activity_id)
+        orgs = await self.repo.get_organizations_with_activity(activity_id)
+        return orgs
