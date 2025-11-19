@@ -13,7 +13,7 @@ from geoalchemy2 import Geography, functions as geo_func
 class OrganizationRepo:
     def __init__(self, session: AsyncSession):
         self.session = session
-        self._mapper = OrganizationMapper
+        self._mapper = OrganizationMapper()
 
     async def get_org_by_recursive_activity(
         self, activity_name: str
