@@ -1,4 +1,23 @@
+networks:
+  hnh_network:
+    driver: bridge
+
+volumes:
+  postgis_data:
+
 services:
+
+  backend:
+    container_name: hnh_backend
+    build:
+      context: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - hnh_network
 
   db:
     image: postgis/postgis:16-3.4
@@ -11,7 +30,8 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgis_data:/var/lib/postgresql/data
+      - ./db_init:/docker-entrypoint-initdb.d
     healthcheck:
       test: [ "CMD", "pg_isready", "-U", "postgres" ]
       interval: 10s
@@ -19,10 +39,5 @@ services:
       retries: 5
     networks:
       - hnh_network
-
-volumes:
-  postgres_data:
-
-networks:
-  hnh_network:
-    driver: bridge
+  
+    
