@@ -9,6 +9,7 @@ dependencies = [
     "asyncpg>=0.30.0",
     "fastapi>=0.121.2",
     "geoalchemy2>=0.18.0",
+    "gunicorn>=23.0.0",
     "pre-commit>=4.4.0",
     "pydantic>=2.12.4",
     "pydantic-extra-types[phonenumbers]>=2.10.6",
